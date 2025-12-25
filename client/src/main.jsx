@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { FilterProvider } from './context/FilterContext';
 import App from './App';
 import './styles/global.scss';
 
@@ -28,9 +29,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <App />
-              <Toaster position="top-right" />
-              <ReactQueryDevtools initialIsOpen={false} />
+              <FilterProvider>
+                <App />
+                <Toaster position="top-right" />
+                <ReactQueryDevtools initialIsOpen={false} />
+              </FilterProvider>
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

@@ -1,35 +1,40 @@
-import { useCartUI } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 import "../styles/CartSidebar.scss";
 
 const CartSidebar = () => {
-  const { isCartOpen, closeCart } = useCartUI();
-
-  // Тут поки просто мок-дані, потім підключимо CartContext для реальних товарів
-  const cartItems = [
-    { id: 1, name: "Book 1", price: 15 },
-    { id: 2, name: "Book 2", price: 20 },
-  ];
+  const { cartItems, removeFromCart, clearCart, isCartOpen, toggleCartOpen } = useCart();
 
   if (!isCartOpen) return null;
+
+  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
     <div className="cart-sidebar">
       <div className="cart-header">
-        <h3>Корзина</h3>
-        <button onClick={closeCart}>✖</button>
+        <h3>Кошик</h3>
+        <button onClick={toggleCartOpen}>✖</button>
       </div>
-      <ul className="cart-items">
-        {cartItems.map(item => (
-          <li key={item.id}>
-            <span>{item.name}</span>
-            <span>${item.price}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="cart-footer">
-        <strong>Загальна сума: ${cartItems.reduce((acc, item) => acc + item.price, 0)}</strong>
-        <button className="checkout-btn">Перейти до оплати</button>
-      </div>
+
+      {cartItems.length === 0 ? (
+        <p>Ваш кошик порожній</p>
+      ) : (
+        <>
+          <ul className="cart-items">
+            {cartItems.map(item => (
+              <li key={item.id}>
+                <span>{item.title}</span>
+                <span>{item.price} ₴ x {item.quantity}</span>
+                <button onClick={() => removeFromCart(item.id)}>Видалити</button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="cart-footer">
+            <strong>Загальна сума: {totalPrice} ₴</strong>
+            <button className="checkout-btn" onClick={clearCart}>Очистити кошик</button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

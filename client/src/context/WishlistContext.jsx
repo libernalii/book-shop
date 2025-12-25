@@ -3,45 +3,42 @@ import { createContext, useContext, useState } from 'react';
 const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
-    const [wishlist, setWishlist] = useState([]);
-    const [isWishlistOpen, setWishlistOpen] = useState(false);
+  const [wishlist, setWishlist] = useState([]);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
-    // Управління масивом обраних
-    const addToWishlist = (item) => {
-        setWishlist(prev => prev.find(i => i._id === item._id) ? prev : [...prev, item]);
-    };
+  const addToWishlist = (book) => {
+    if (!wishlist.find(item => item.id === book.id)) setWishlist(prev => [...prev, book]);
+  };
 
-    const removeFromWishlist = (id) => {
-        setWishlist(prev => prev.filter(item => item._id !== id));
-    };
+  const removeFromWishlist = (bookId) => {
+    setWishlist(prev => prev.filter(item => item.id !== bookId));
+  };
 
-    const toggleWishlist = (item) => {
-        setWishlist(prev =>
-            prev.find(i => i._id === item._id)
-                ? prev.filter(i => i._id !== item._id)
-                : [...prev, item]
-        );
-    };
+  const toggleWishlist = (book) => {
+    const exists = wishlist.find(item => item.id === book.id);
+    if (exists) removeFromWishlist(book.id);
+    else addToWishlist(book);
+  };
 
-    // Управління UI сайдбару
-    const toggleWishlistUI = () => setWishlistOpen(prev => !prev);
-    const openWishlist = () => setWishlistOpen(true);
-    const closeWishlist = () => setWishlistOpen(false);
+  const isInWishlist = (bookId) => wishlist.some(item => item.id === bookId);
 
-    return (
-        <WishlistContext.Provider value={{
-            wishlist,
-            addToWishlist,
-            removeFromWishlist,
-            toggleWishlist,
-            isWishlistOpen,
-            toggleWishlistUI,
-            openWishlist,
-            closeWishlist
-        }}>
-            {children}
-        </WishlistContext.Provider>
-    );
+  const toggleWishlistOpen = (state) => {
+    setIsWishlistOpen(state !== undefined ? state : !isWishlistOpen);
+  };
+
+  return (
+    <WishlistContext.Provider value={{
+      wishlist,
+      addToWishlist,
+      removeFromWishlist,
+      toggleWishlist,
+      isInWishlist,
+      isWishlistOpen,
+      toggleWishlistOpen
+    }}>
+      {children}
+    </WishlistContext.Provider>
+  );
 };
 
 export const useWishlist = () => useContext(WishlistContext);
