@@ -6,8 +6,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import App from './App';
-// import './styles/global.scss';
+import './styles/global.scss';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,9 +27,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <App />
-            <Toaster position="top-right" />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <WishlistProvider>
+              <App />
+              <Toaster position="top-right" />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
