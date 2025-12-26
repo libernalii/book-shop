@@ -1,15 +1,20 @@
-// src/pages/ProductPage.jsx
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 import { productsAPI } from '../api/products';
 import '../styles/ProductPage.scss';
 
-function ProductPage() {
+const ProductPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { addToCart, cartItems, toggleCartOpen } = useCart();
   const { toggleWishlist, isInWishlist, toggleWishlistOpen } = useWishlist();
+  const [heartAnimation, setHeartAnimation] = useState(false);
+
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,30 +24,46 @@ function ProductPage() {
       try {
         const { data } = await productsAPI.getById(id);
         setProduct(data);
-      } catch (error) {
-        console.error('Помилка завантаження книги:', error);
+      } catch (err) {
+        console.error('Помилка завантаження книги:', err);
       } finally {
         setLoading(false);
       }
     }
-
     fetchProduct();
   }, [id]);
 
   if (loading) return <div className="product-page container">Завантаження...</div>;
   if (!product) return <div className="product-page container">Книга не знайдена</div>;
 
-  const inCart = cartItems.some(item => item.id === product._id);
+  const inCart = cartItems.some(
+    item => item._id === product._id || item.product?._id === product._id
+  );
+
 
   const handleAddToCart = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     addToCart(product);
     toggleCartOpen(true);
   };
 
   const handleToggleWishlist = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     toggleWishlist(product);
     toggleWishlistOpen(true);
+
+    setHeartAnimation(true);
+    setTimeout(() => setHeartAnimation(false), 300);
   };
+
+
 
   return (
     <div className="product-page container">
@@ -57,23 +78,25 @@ function ProductPage() {
 
           <div className="actions">
             <button
+              className={`wishlist-btn ${isInWishlist(product._id) ? 'active' : ''} ${heartAnimation ? 'beat' : ''}`}
+              onClick={handleToggleWishlist}
+            >
+              <Heart size={20} />
+            </button>
+
+
+            <button
               className={`cart-btn ${inCart ? 'in-cart' : ''}`}
               onClick={handleAddToCart}
             >
-              {inCart ? 'У кошику' : 'Додати в кошик'}
-            </button>
-
-            <button
-              className={`wishlist-btn ${isInWishlist(product._id) ? 'active' : ''}`}
-              onClick={handleToggleWishlist}
-            >
-              {isInWishlist(product._id) ? 'У вішлісті' : 'Додати у вішліст'}
+              <ShoppingCart size={20} /> {inCart ? 'У кошику' : 'Додати в кошик'}
             </button>
           </div>
+
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default ProductPage;

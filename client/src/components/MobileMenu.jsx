@@ -28,8 +28,14 @@ function MobileMenu({ isOpen, onClose, categories }) {
                 </div>
 
                 <div className="actions">
-                    <button onClick={() => { toggleWishlist(); onClose(); }}><Heart size={20} /> Вішліст</button>
-                    <button onClick={() => { toggleCart(); onClose(); }}><ShoppingCart size={20} /> Кошик</button>
+                    <button className="icon-btn" onClick={() => toggleWishlistOpen()}>
+                        <Heart size={20} />
+                        {wishlist.length > 0 && <span className="badge">{wishlist.length}</span>}
+                    </button>
+                    <button className="icon-btn" onClick={toggleCartOpen}>
+                        <ShoppingCart size={20} />
+                        {cartItems.length > 0 && <span className="cart-count">{cartItems.length}</span>}
+                    </button>
                 </div>
 
                 <div className="auth">

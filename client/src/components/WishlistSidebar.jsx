@@ -2,7 +2,7 @@ import { useWishlist } from '../context/WishlistContext';
 import "../styles/WishlistSidebar.scss";
 
 function WishlistSidebar() {
-  const { wishlist, removeFromWishlist, isWishlistOpen, closeWishlist } = useWishlist();
+  const { wishlist, removeFromWishlist, isWishlistOpen, toggleWishlistOpen } = useWishlist();
 
   if (!isWishlistOpen) return null;
 
@@ -10,7 +10,7 @@ function WishlistSidebar() {
     <div className="wishlist-sidebar">
       <div className="wishlist-header">
         <h3>Вішліст</h3>
-        <button onClick={closeWishlist}>✖</button>
+        <button onClick={() => toggleWishlistOpen(false)}>✖</button>
       </div>
 
       {wishlist.length === 0 ? (

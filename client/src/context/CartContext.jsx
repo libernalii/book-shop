@@ -1,68 +1,108 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { cartAPI } from '../api/cart';
-import { useAuth } from '../context/AuthContext';
-
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Завантаження кошика з сервера після логіну
+  const { user } = useAuth();
+
+  // 🔹 Синхронізація кошика з сервером при логіні
   useEffect(() => {
-    if (user) {
-      cartAPI.get()
-        .then(res => setCartItems(res.data))
-        .catch(() => setCartItems([]));
-    } else {
-      setCartItems([]);
+    if (user && cartItems.length > 0) {
+      cartAPI.sync(
+        cartItems.map(item => ({
+          product: item._id,
+          quantity: item.quantity
+        }))
+      )
+      .then(res => {
+        // Перетворюємо відповідь сервера на формат фронтенду
+        setCartItems(
+          res.data.items.map(i => ({
+            _id: i.product._id,
+            title: i.product.name,
+            price: i.product.finalPrice ?? i.product.price,
+            image: i.product.image,
+            quantity: i.quantity
+          }))
+        );
+      })
+      .catch(err => console.error('Cart sync error', err));
     }
   }, [user]);
 
-  const addToCart = async (book) => {
-    try {
-      const exists = cartItems.find(item => item.id === book.id);
+  // 🔹 Завантаження з localStorage
+  useEffect(() => {
+    const storedCart = localStorage.getItem('cart');
+    if (storedCart) setCartItems(JSON.parse(storedCart));
+  }, []);
+
+  // 🔹 Збереження в localStorage
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // 🔹 Додати товар
+  const addToCart = (product) => {
+    setCartItems(prev => {
+      const exists = prev.find(item => item._id === product._id);
       if (exists) {
-        await cartAPI.updateItem(book.id, { quantity: exists.quantity + 1 });
-      } else {
-        await cartAPI.addItem({ productId: book.id, quantity: 1 });
+        return prev.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       }
-      refreshCart();
-    } catch (error) {
-      console.error('Cart add error:', error);
-    }
+      return [
+        ...prev,
+        {
+          _id: product._id,
+          title: product.name,
+          price: product.finalPrice ?? product.price,
+          image: product.image,
+          quantity: 1
+        }
+      ];
+    });
   };
 
-  const removeFromCart = async (bookId) => {
-    try {
-      await cartAPI.removeItem(bookId);
-      refreshCart();
-    } catch (error) {
-      console.error('Cart remove error:', error);
-    }
+  // 🔹 Видалити товар
+  const removeFromCart = (productId) => {
+    setCartItems(prev => prev.filter(item => item._id !== productId));
   };
 
-  const clearCart = async () => {
-    try {
-      await cartAPI.clear();
-      setCartItems([]);
-    } catch (error) {
-      console.error('Clear cart error:', error);
-    }
+  // 🔹 Збільшити кількість
+  const increaseQuantity = (productId) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item._id === productId
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
   };
 
-  const toggleCartItem = (book) => {
-    const exists = cartItems.find(item => item.id === book.id);
-    if (exists) removeFromCart(book.id);
-    else addToCart(book);
+  // 🔹 Зменшити кількість
+  const decreaseQuantity = (productId) => {
+    setCartItems(prev =>
+      prev
+        .map(item =>
+          item._id === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter(item => item.quantity > 0)
+    );
   };
 
-  const refreshCart = () => {
-    cartAPI.get().then(res => setCartItems(res.data)).catch(() => setCartItems([]));
-  };
+  // 🔹 Очистити кошик
+  const clearCart = () => setCartItems([]);
 
+  // 🔹 Відкрити / закрити кошик
   const toggleCartOpen = (state) => {
     setIsCartOpen(state !== undefined ? state : !isCartOpen);
   };
@@ -72,9 +112,9 @@ export const CartProvider = ({ children }) => {
       cartItems,
       addToCart,
       removeFromCart,
+      increaseQuantity,
+      decreaseQuantity,
       clearCart,
-      toggleCartItem,
-      refreshCart,
       isCartOpen,
       toggleCartOpen
     }}>

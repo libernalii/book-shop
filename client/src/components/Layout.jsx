@@ -7,12 +7,16 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useFilter } from '../context/FilterContext';
 
+import CartSidebar from './CartSidebar';
+import WishlistSidebar from './/WishlistSidebar';
+
+
 import '../styles/Header.scss';
 
 function Layout() {
   const { isAuthenticated, user, logout } = useAuth();
-  const { toggleCartOpen } = useCart();
-  const { toggleWishlistOpen } = useWishlist();
+  const { toggleCartOpen, cartItems } = useCart();
+  const { wishlist, toggleWishlistOpen, isWishlistOpen } = useWishlist();
   const { searchTerm, setSearchTerm } = useFilter(); // підключення фільтрів
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,13 +41,16 @@ function Layout() {
           <nav className="desktop-nav desktop-only">
             <Link to="/catalog">Каталог</Link> {/* <-- змінили посилання на CatalogPage */}
 
-            <button className="icon-btn" onClick={toggleWishlistOpen}>
+            <button className="icon-btn" onClick={() => toggleWishlistOpen()}>
               <Heart size={20} />
+              {wishlist.length > 0 && <span className="badge">{wishlist.length}</span>}
             </button>
 
             <button className="icon-btn" onClick={toggleCartOpen}>
               <ShoppingCart size={20} />
+              {cartItems.length > 0 && <span className="cart-count">{cartItems.length}</span>}
             </button>
+
 
             {isAuthenticated ? (
               <>
@@ -102,6 +109,9 @@ function Layout() {
           </div>
         </div>
       )}
+
+      <CartSidebar />
+      <WishlistSidebar />
 
       <main>
         <Outlet /> {/* Тут будуть відображатися сторінки, включаючи CatalogPage */}

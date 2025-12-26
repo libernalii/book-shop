@@ -4,20 +4,43 @@ const FilterContext = createContext(null);
 
 export const FilterProvider = ({ children }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('all');
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [category, setCategory] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [page, setPage] = useState(1);
+
+  const resetPage = () => setPage(1);
 
   const resetFilters = () => {
     setSearchTerm('');
-    setCategory('all');
-    setPriceRange([0, 1000]);
+    setCategory('');
+    setSortBy('');
+    setPage(1);
   };
 
   return (
-    <FilterContext.Provider value={{ searchTerm, setSearchTerm, category, setCategory, priceRange, setPriceRange, resetFilters }}>
+    <FilterContext.Provider
+      value={{
+        searchTerm,
+        setSearchTerm,
+        category,
+        setCategory,
+        sortBy,
+        setSortBy,
+        page,
+        setPage,
+        resetPage,
+        resetFilters,
+      }}
+    >
       {children}
     </FilterContext.Provider>
   );
 };
 
-export const useFilter = () => useContext(FilterContext);
+export const useFilter = () => {
+  const ctx = useContext(FilterContext);
+  if (!ctx) {
+    throw new Error('useFilter must be used inside FilterProvider');
+  }
+  return ctx;
+};
