@@ -16,7 +16,8 @@ function BookCard({ book }) {
 
   const inCart = cartItems.some(item => item._id === book._id);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // ⬅️ щоб клік по кнопці не відкривав сторінку
     if (!user) {
       navigate('/login');
       return;
@@ -25,11 +26,15 @@ function BookCard({ book }) {
     toggleCartOpen(true);
   };
 
-  const handleToggleWishlist = () => {
+  const handleToggleWishlist = (e) => {
+    e.stopPropagation(); // ⬅️ щоб клік по кнопці не відкривав сторінку
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     toggleWishlist(book);
     toggleWishlistOpen(true);
 
-    // Анімація «биття» сердечка
     setHeartAnimation(true);
     setTimeout(() => setHeartAnimation(false), 300);
   };
@@ -39,32 +44,25 @@ function BookCard({ book }) {
   };
 
   return (
-    <div className="book-card">
-      <img
-        src={book.image}
-        alt={book.title}
-        onClick={goToProductPage}
-        style={{ cursor: 'pointer' }}
-      />
-      <h3 onClick={goToProductPage} style={{ cursor: 'pointer' }}>
-        {book.title}
-      </h3>
-      <p>{book.author}</p>
-      <p>{book.price} ₴</p>
+    <div className="book-card" onClick={goToProductPage}>
+      <img src={book.image} alt={book.name} />
+      <h3>{book.name}</h3>
+      <p className="author">{book.author || 'Невідомо'}</p>
+      <p className="price">{book.price} ₴</p>
 
       <div className="actions">
-        <button
-          className={`wishlist-btn ${isInWishlist(book._id) ? 'active' : ''} ${heartAnimation ? 'beat' : ''}`}
-          onClick={handleToggleWishlist}
-        >
-          <Heart size={16} />
-        </button>
-
         <button
           className={`cart-btn ${inCart ? 'in-cart' : ''}`}
           onClick={handleAddToCart}
         >
           <ShoppingCart size={16} /> {inCart ? 'У кошику' : 'Додати'}
+        </button>
+
+        <button
+          className={`wishlist-btn ${isInWishlist(book._id) ? 'active' : ''} ${heartAnimation ? 'beat' : ''}`}
+          onClick={handleToggleWishlist}
+        >
+          <Heart size={18} />
         </button>
       </div>
     </div>

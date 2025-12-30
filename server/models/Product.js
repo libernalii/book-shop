@@ -9,6 +9,14 @@ const ProductSchema = new mongoose.Schema(
       minlength: [3, 'Назва має бути не менше 3 символів'],
       maxlength: [200, 'Назва має бути не більше 200 символів']
     },
+
+    author: {
+      type: String,
+      required: [true, 'Автор є обов\'язковим'],
+      trim: true,
+      maxlength: [100, 'Імʼя автора занадто довге']
+    },
+
     description: {
       type: String,
       required: [true, 'Опис товару є обов\'язковим'],
@@ -16,38 +24,42 @@ const ProductSchema = new mongoose.Schema(
       minlength: [10, 'Опис має бути не менше 10 символів'],
       maxlength: [2000, 'Опис має бути не більше 2000 символів']
     },
+
     price: {
       type: Number,
       required: [true, 'Ціна є обов\'язковою'],
       min: [0, 'Ціна не може бути від\'ємною']
     },
+
     discount: {
       type: Number,
       default: 0,
       min: [0, 'Знижка не може бути від\'ємною'],
       max: [100, 'Знижка не може перевищувати 100%']
     },
+
     stock: {
       type: Number,
       required: [true, 'Кількість на складі є обов\'язковою'],
       min: [0, 'Кількість не може бути від\'ємною'],
       default: 0
     },
+
     image: {
       type: String,
       required: [true, 'Головне зображення є обов\'язковим'],
       trim: true
     },
+
     images: {
       type: [String],
       default: [],
       validate: {
-        validator: function(arr) {
-          return arr.length <= 5;
-        },
+        validator: (arr) => arr.length <= 5,
         message: 'Максимум 5 додаткових зображень'
       }
     },
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
@@ -61,22 +73,19 @@ const ProductSchema = new mongoose.Schema(
   }
 );
 
-// Віртуальне поле - фінальна ціна зі знижкою
+// Віртуальна фінальна ціна
 ProductSchema.virtual('finalPrice').get(function () {
-  if (this.discount > 0) {
-    return Math.round(this.price * (1 - this.discount / 100));
-  }
-  return this.price;
+  return this.discount > 0
+    ? Math.round(this.price * (1 - this.discount / 100))
+    : this.price;
 });
 
-// Віртуальне поле - чи є товар в наявності
+// Чи є в наявності
 ProductSchema.virtual('inStock').get(function () {
   return this.stock > 0;
 });
 
-// Індекс для пошуку по назві та опису
-ProductSchema.index({ name: 'text', description: 'text' });
+// Пошук
+ProductSchema.index({ name: 'text', description: 'text', author: 'text' });
 
-const Product = mongoose.model('Product', ProductSchema);
-
-export default Product;
+export default mongoose.model('Product', ProductSchema);

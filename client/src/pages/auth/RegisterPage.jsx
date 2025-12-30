@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-
 import "../../styles/auth.scss"
 
 function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -18,12 +17,19 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
 
+    if (password !== confirmPassword) {
+      setError('Паролі не співпадають');
+      return;
+    }
+
+    setLoading(true);
     try {
-      await register({ name, email, password });
+      // Відправляємо тільки поля, які є в схемі: fullName, email, password
+      await register({ fullName, email, password });
       navigate('/');
     } catch (err) {
+      console.log(err.response?.data); // щоб бачити точну помилку від сервера
       setError(err.response?.data?.error || 'Помилка реєстрації');
     } finally {
       setLoading(false);
@@ -39,9 +45,9 @@ function RegisterPage() {
 
         <input
           type="text"
-          placeholder="Імʼя"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder="ПІБ"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           required
         />
 

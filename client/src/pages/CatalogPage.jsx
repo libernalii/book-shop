@@ -57,7 +57,7 @@ function CatalogPage() {
   }, [products, sortBy]);
 
   return (
-    <div className="catalog-page container">
+    <div className="catalog-page container page">
       <h1>Каталог книг</h1>
 
       {/* Фільтри */}

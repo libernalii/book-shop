@@ -54,51 +54,103 @@ const seedData = async () => {
     const seedProducts = [
       // Фентезі
       {
-        name: 'Гаррі Поттер і філософський камінь — Дж. К. Ролінґ',
+        name: 'Гаррі Поттер і філософський камінь. Ілюстроване видання',
+        author: 'Дж. К. Ролінґ',
         description: 'Перша книга легендарної серії про хлопчика, який дізнається, що він чарівник.',
-        price: 399,
+        price: 499,
         discount: 10,
         stock: 20,
-        image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400',
+        image: 'https://bookinstein.ua/files/resized/products/630345_1-1.600x800.jpg.webp',
+        category: categories[0]._id
+      },
+     {
+        name: 'Гаррі Поттер i Орден Фенікса',
+        author: 'Дж. К. Ролінґ',
+        description: 'Ніхто й не сподівався, що п’ятий рік навчання у Ґогвортсі буде для Гаррі та його друзів легкою прогулянкою. Проте запровадження в школі посади Верховного інквізитора ще більше все ускладнило...',
+        price: 450,
+        discount: 10,
+        stock: 21,
+        image: 'https://bookinstein.ua/files/resized/products/130_1_2-1-1-1.600x800.jpg.webp',
         category: categories[0]._id
       },
       {
-        name: 'Володар перснів: Хранителі персня — Дж. Р. Р. Толкін',
+        name: 'Клітка короля',
+        author: 'Вікторія Авеярд',
+        description: 'Мара Барров живе у світі, де всі знають: люди зі срібною кров’ю народжені панувати. Люди з багряною кров’ю приречені бути рабами. Мара – дівчина з багряною кров’ю самим фактом свого існування ставить під сумнів справедливість предковічного ладу й одразу стає символом боротьби за права пригноблених багряних.',
+        price: 200,
+        stock: 15,
+        image: 'https://bookinstein.ua/files/resized/products/id709159.600x800.png.webp',
+        category: categories[0]._id
+      },
+      {
+        name: 'Володар перснів. Братство персня',
+        author: 'Дж. Р. Р. Толкін',
         description: 'Епічна подорож Середзем’ям задля знищення Персня Всевладдя.',
         price: 499,
         stock: 15,
-        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
+        image: 'https://static.yakaboo.ua/media/cloudflare/product/webp/600x840/i/m/img_70506_1.jpg',
         category: categories[0]._id
       },
 
       // Роман
       {
-        name: 'Гордість і упередження — Джейн Остін',
+        name: 'Гордість і упередження',
+        author: 'Джейн Остін',
         description: 'Класичний роман про кохання, гордість і соціальні упередження.',
         price: 299,
         stock: 12,
-        image: 'https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400',
+        image: 'https://static.yakaboo.ua/media/cloudflare/product/webp/600x840/f/i/file_213_8.png',
+        category: categories[1]._id
+      },
+      {
+        name: 'Огидне кохання',
+        author: 'Коллін Гувер',
+        description: 'Книга розповідає про подорож до зцілення та другий шанс, й те, що іноді саме нам належить зробити перший крок до цього.',
+        price: 299,
+        stock: 10,
+        image: 'https://static.yakaboo.ua/media/cloudflare/product/webp/600x840/i/m/img167_1_23.jpg',
         category: categories[1]._id
       },
 
       // Детектив
       {
-        name: 'Вбивство у Східному експресі — Аґата Крісті',
+        name: 'Вбивство у Східному експресі',
+        author: 'Аґата Крісті',
         description: 'Знамените розслідування Еркюля Пуаро у розкішному поїзді.',
         price: 349,
         discount: 5,
         stock: 10,
-        image: 'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400',
+        image: 'https://bookinstein.ua/files/resized/products/58488_116217.600x800.jpg.webp',
+        category: categories[2]._id
+      },
+      {
+        name: 'І не лишилось жодного',
+        author: 'Аґата Крісті',
+        description: ' Десятеро незнайомців опинилися на далекому Солдатському острові: усі отримали дивне запрошення приїхати сюди, до розкішного будинку. Однак поки вони не розуміють, хто і для чого їх викликав… Згодом починається жахіття: хтось жорстоко й вигадливо вбиває гостей, а зі столу, на якому стояло рівно десять порцелянових статуеток, перед кожним убивством зникає одна… Як ця моторошна історія пов’язана із дитячою лічилкою? І, головне, хто наступний?',
+        price: 200,
+        discount: 5,
+        stock: 14,
+        image: 'https://bookinstein.ua/files/resized/products/id90380.600x800.png.webp',
         category: categories[2]._id
       },
 
       // Саморозвиток
       {
-        name: 'Атомні звички — Джеймс Клір',
+        name: 'Атомні звички',
+        author: 'Джеймс Клір',
         description: 'Практичний гід про те, як маленькі звички змінюють життя.',
         price: 379,
         stock: 18,
-        image: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=400',
+        image: 'https://bookinstein.ua/files/resized/products/757079_1_original.600x800.jpeg.webp',
+        category: categories[3]._id
+      },
+      {
+        name: 'Засновники. Історія створення PayPal та Кремнієвої долини',
+        author: 'Джиммі Соні',
+        description: 'Ілон Маск, Емі Роу Клемент, Пітер Тіль, Джулі Андерсон, Макс Левчин — імена, які бентежать нашу уяву. Колись ці люди були невідомими творцями пересічної компанії, яка проводила онлайн-платежі, а сьогодні їх вважають одними з найвпливовіших у технологічній галузі. Після створення PayPal вони фінансували та консультували провідні компанії світу: Tesla, Facebook, YouTube, SpaceX, Yelp, Palantir, LinkedIn тощо.',
+        price: 399,
+        stock: 18,
+        image: 'https://bookinstein.ua/files/resized/products/3507da04_bez-imeni-1.600x800.jpg.webp',
         category: categories[3]._id
       }
     ];

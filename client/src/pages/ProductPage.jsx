@@ -66,32 +66,32 @@ const ProductPage = () => {
 
 
   return (
-    <div className="product-page container">
+    <div className="product-page container page">
       <div className="product-details">
-        <img src={product.image} alt={product.title} className="product-image" />
+        <img src={product.image} alt={product.name} className="product-image" />
         <div className="product-info">
-          <h1>{product.title}</h1>
-          <p className="author">Автор: {product.author}</p>
+          <h1>{product.name}</h1>
+          <p className="author">Автор: {product.author || 'Невідомо'}</p>
           <p className="category">Категорія: {product.category?.name || 'Невідомо'}</p>
           <p className="price">{product.price} ₴</p>
           <p className="description">{product.description}</p>
 
           <div className="actions">
             <button
-              className={`wishlist-btn ${isInWishlist(product._id) ? 'active' : ''} ${heartAnimation ? 'beat' : ''}`}
-              onClick={handleToggleWishlist}
-            >
-              <Heart size={20} />
-            </button>
-
-
-            <button
               className={`cart-btn ${inCart ? 'in-cart' : ''}`}
               onClick={handleAddToCart}
             >
               <ShoppingCart size={20} /> {inCart ? 'У кошику' : 'Додати в кошик'}
             </button>
+
+            <button
+              className={`wishlist-btn ${isInWishlist(product._id) ? 'active' : ''} ${heartAnimation ? 'beat' : ''}`}
+              onClick={handleToggleWishlist}
+            >
+              <Heart size={20} />
+            </button>
           </div>
+
 
         </div>
       </div>

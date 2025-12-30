@@ -1,125 +1,99 @@
 .product-page {
-    padding: 2rem 0;
+  padding: 3rem 0;
 
-    .product-details {
+  .product-details {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+
+    .product-image {
+      width: 100%;
+      height: 520px; // 🔥 фіксована висота
+      object-fit: contain;
+      background-color: #f6f6f6;
+      border-radius: 14px;
+      padding: 1rem;
+    }
+
+    .product-info {
+      display: flex;
+      flex-direction: column;
+
+      h1 {
+        font-size: 2.1rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .author {
+        font-style: italic;
+        color: #666;
+      }
+
+      .category {
+        color: #444;
+        margin-bottom: 0.6rem;
+      }
+
+      .price {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #2e7d32;
+        margin: 0.8rem 0;
+      }
+
+      .description {
+        line-height: 1.7;
+        color: #444;
+        margin-bottom: 1.5rem;
+      }
+
+      .actions {
         display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
+        gap: 1rem;
+        margin-top: auto;
 
-        .product-image {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 8px;
-            object-fit: cover;
+        .cart-btn {
+          background-color: #111;
+          color: #fff;
+          padding: 0.8rem 1.8rem;
+          border-radius: 10px;
+          border: none;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+
+          &.in-cart {
+            background-color: #555;
+          }
         }
 
-        .product-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .wishlist-btn {
+          background: transparent;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          padding: 0.7rem;
+          cursor: pointer;
+          color: #e53935;
 
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .author,
-            .category,
-            .price {
-                font-weight: 500;
-                margin-bottom: 0.3rem;
-            }
-
-            .description {
-                margin: 1rem 0;
-                line-height: 1.5;
-            }
-
-            .actions {
-                display: flex;
-                gap: 1rem;
-                flex-wrap: wrap;
-
-                .cart-btn,
-                .wishlist-btn {
-                    padding: 0.8rem 1.5rem;
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: 500;
-                    transition: background 0.2s, color 0.2s;
-                }
-
-                .cart-btn {
-                    background-color: #4caf50;
-                    color: #fff;
-
-                    &.in-cart {
-                        background-color: #2e7d32;
-                    }
-
-                    &:hover {
-                        background-color: #45a049;
-                    }
-                }
-
-                .wishlist-btn {
-                    background-color: #ff4081;
-                    color: #fff;
-
-                    &.active {
-                        background-color: #c2185b;
-                    }
-
-                    &:hover {
-                        background-color: #f50057;
-                    }
-
-                    .wishlist-btn.beat {
-                        animation: beat 0.3s ease-in-out;
-                    }
-
-                    @keyframes beat {
-                        0% {
-                            transform: scale(1);
-                        }
-
-                        25% {
-                            transform: scale(1.3);
-                        }
-
-                        50% {
-                            transform: scale(1);
-                        }
-
-                        75% {
-                            transform: scale(1.2);
-                        }
-
-                        100% {
-                            transform: scale(1);
-                        }
-                    }
-
-                }
-            }
+          &.active {
+            background-color: #ffe5e5;
+          }
         }
+      }
     }
+  }
 
-    @media (max-width: 768px) {
-        .product-details {
-            flex-direction: column;
-            align-items: center;
+  @media (max-width: 768px) {
+    .product-details {
+      grid-template-columns: 1fr;
+      text-align: center;
 
-            .product-info {
-                width: 100%;
-                text-align: center;
-
-                .actions {
-                    justify-content: center;
-                }
-            }
-        }
+      .actions {
+        justify-content: center;
+      }
     }
+  }
 }
