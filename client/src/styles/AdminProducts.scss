@@ -1,0 +1,42 @@
+.admin-page {
+  padding: 24px;
+}
+
+.admin-form {
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.admin-form .row {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-table button {
+  margin-right: 6px;
+  cursor: pointer;
+}
