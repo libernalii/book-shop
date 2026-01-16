@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       const token = localStorage.getItem('accessToken');
 
-      // якщо токена нема — не ліземо на бек
       if (!token) {
         setLoading(false);
         return;
@@ -23,13 +22,13 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const { data } = await authAPI.getMe();
-        setUser(data);
-        localStorage.setItem('user', JSON.stringify(data));
+
+        if (data?._id) {
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
+        }
       } catch (error) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        setUser(null);
+        console.warn('Auth check failed, using cached user');
       } finally {
         setLoading(false);
       }
@@ -37,6 +36,7 @@ export const AuthProvider = ({ children }) => {
 
     initAuth();
   }, []);
+
 
   const login = async (credentials) => {
     const { data } = await authAPI.login(credentials);

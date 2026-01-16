@@ -9,7 +9,7 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { user } = useAuth();
 
-  const syncedRef = useRef(false); // 🔒 щоб sync був 1 раз
+  const syncedRef = useRef(false); 
 
   /* ========= LOAD FROM LOCALSTORAGE ========= */
   useEffect(() => {

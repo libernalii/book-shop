@@ -9,7 +9,7 @@ const emptyProduct = {
   description: '',
   price: '',
   discount: 0,
-  stock: 0,
+  stock: '',
   image: '',
   category: ''
 };
@@ -21,68 +21,105 @@ const ProductsPage = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  /* ================= LOAD DATA ================= */
   const loadData = async () => {
-    setLoading(true);
-    const [{ data: productsData }, { data: categoriesData }] =
-      await Promise.all([
-        productsAPI.getAll({ limit: 100 }),
-        categoriesAPI.getAll()
-      ]);
+    try {
+      setLoading(true);
 
-    setProducts(productsData.products);
-    setCategories(categoriesData);
-    setLoading(false);
+      const [{ data: productsData }, { data: categoriesData }] =
+        await Promise.all([
+          productsAPI.getAll({ limit: 100 }),
+          categoriesAPI.getAll()
+        ]);
+
+      setProducts(productsData.products);
+      setCategories(categoriesData);
+    } catch (err) {
+      console.error(err);
+      alert('Помилка завантаження даних');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
+  /* ================= FORM ================= */
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
+
+  const buildPayload = () => ({
+    name: form.name.trim(),
+    author: form.author.trim(),
+    description: form.description.trim(),
+    image: form.image.trim(),
+    category: form.category,
+    price: Number(form.price),
+    discount: Number(form.discount) || 0,
+    stock: Number(form.stock)
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      discount: Number(form.discount),
-      stock: Number(form.stock),
-    };
-
-    if (editingId) {
-      await productsAPI.update(editingId, payload);
-    } else {
-      await productsAPI.create(payload);
+    if (!form.category) {
+      alert('Оберіть категорію');
+      return;
     }
 
-    setForm(emptyProduct);
-    setEditingId(null);
-    loadData();
-  };
+    try {
+      const payload = buildPayload();
 
+      if (editingId) {
+        await productsAPI.update(editingId, payload);
+      } else {
+        await productsAPI.create(payload);
+      }
+
+      setForm(emptyProduct);
+      setEditingId(null);
+      loadData();
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      alert(err.response?.data?.error || 'Помилка збереження');
+    }
+  };
 
   const handleEdit = (product) => {
     setEditingId(product._id);
     setForm({
-      ...product,
-      category: product.category?._id
+      name: product.name || '',
+      author: product.author || '',
+      description: product.description || '',
+      price: product.price ?? '',
+      discount: product.discount ?? 0,
+      stock: product.stock ?? '',
+      image: product.image || '',
+      category: product.category?._id || ''
     });
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Видалити товар?')) return;
-    await productsAPI.delete(id);
-    loadData();
+    if (!window.confirm('Видалити товар?')) return;
+
+    try {
+      await productsAPI.delete(id);
+      loadData();
+    } catch (err) {
+      console.error(err);
+      alert('Помилка видалення');
+    }
   };
 
+  /* ================= UI ================= */
   return (
     <div className="admin-page">
       <h1>Товари</h1>
 
-      {/* FORM */}
       <form className="admin-form" onSubmit={handleSubmit}>
         <input name="name" placeholder="Назва" value={form.name} onChange={handleChange} required />
         <input name="author" placeholder="Автор" value={form.author} onChange={handleChange} required />
@@ -97,9 +134,9 @@ const ProductsPage = () => {
         />
 
         <div className="row">
-          <input name="price" type="number" placeholder="Ціна" value={form.price} onChange={handleChange} />
+          <input name="price" type="number" placeholder="Ціна" value={form.price} onChange={handleChange} required />
           <input name="discount" type="number" placeholder="Знижка %" value={form.discount} onChange={handleChange} />
-          <input name="stock" type="number" placeholder="Кількість" value={form.stock} onChange={handleChange} />
+          <input name="stock" type="number" placeholder="Кількість" value={form.stock} onChange={handleChange} required />
         </div>
 
         <select name="category" value={form.category} onChange={handleChange} required>
@@ -114,7 +151,6 @@ const ProductsPage = () => {
         </button>
       </form>
 
-      {/* LIST */}
       {loading ? (
         <p>Завантаження...</p>
       ) : (
@@ -137,7 +173,7 @@ const ProductsPage = () => {
                 <td>{p.price} грн</td>
                 <td>{p.discount}%</td>
                 <td>{p.category?.name}</td>
-                <td>
+                <td className="actions">
                   <button onClick={() => handleEdit(p)}>✏️</button>
                   <button onClick={() => handleDelete(p._id)}>🗑</button>
                 </td>
