@@ -2,12 +2,13 @@ import mongoose from 'mongoose';
 
 const CartSchema = new mongoose.Schema(
   {
-    user: {
+     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
       unique: true
     },
+
     items: [
       {
         product: {
@@ -30,13 +31,13 @@ const CartSchema = new mongoose.Schema(
 );
 
 // Метод для очищення кошика
-CartSchema.methods.clearCart = function() {
+CartSchema.methods.clearCart = function () {
   this.items = [];
   return this.save();
 };
 
 // Метод для додавання товару
-CartSchema.methods.addItem = function(productId, quantity = 1) {
+CartSchema.methods.addItem = function (productId, quantity = 1) {
   const existingItem = this.items.find(
     item => item.product.toString() === productId.toString()
   );
@@ -51,7 +52,7 @@ CartSchema.methods.addItem = function(productId, quantity = 1) {
 };
 
 // Метод для оновлення кількості
-CartSchema.methods.updateItemQuantity = function(productId, quantity) {
+CartSchema.methods.updateItemQuantity = function (productId, quantity) {
   const item = this.items.find(
     item => item.product.toString() === productId.toString()
   );
@@ -70,7 +71,7 @@ CartSchema.methods.updateItemQuantity = function(productId, quantity) {
 };
 
 // Метод для видалення товару
-CartSchema.methods.removeItem = function(productId) {
+CartSchema.methods.removeItem = function (productId) {
   this.items = this.items.filter(
     item => item.product.toString() !== productId.toString()
   );

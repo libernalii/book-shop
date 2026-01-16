@@ -12,14 +12,16 @@ import AdminLayout from '../pages/admin/AdminLayout';
 import CategoriesPage from '../pages/admin/CategoriesPage';
 import ProductsPage from '../pages/admin/ProductsPage';
 import OrdersPage from '../pages/admin/OrdersPage';
+import OrdersHistoryPage from '../pages/orders/OrdersHistoryPage';
+import OrderDetailsPage from '../pages/orders/OrderDetailsPage';
 
 function ProtectedRoute({ children, adminOnly = false }) {
   const { isAuthenticated, user, loading } = useAuth();
 
   if (loading) return <div>Завантаження...</div>;
-  
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  
+
   if (adminOnly && user?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
@@ -36,19 +38,31 @@ function AppRouter() {
         <Route path="products/:id" element={<ProductPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        
+
         <Route path="checkout" element={
           <ProtectedRoute>
             <CheckoutPage />
           </ProtectedRoute>
         } />
-        
+
         <Route path="profile" element={
           <ProtectedRoute>
             <ProfilePage />
           </ProtectedRoute>
         } />
-        
+
+        <Route path="orders" element={
+          <ProtectedRoute>
+            <OrdersHistoryPage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="orders/:id" element={
+          <ProtectedRoute>
+            <OrderDetailsPage />
+          </ProtectedRoute>
+        } />
+
         <Route path="admin" element={
           <ProtectedRoute adminOnly>
             <AdminLayout />

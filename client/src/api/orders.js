@@ -1,9 +1,11 @@
 import api from './axios';
 
 export const ordersAPI = {
-  create: (data) => api.post('/orders', data),
-  getAll: (params) => api.get('/orders', { params }),
+  getAll: () => api.get('/orders'),   // admin
+  getMy: () => api.get('/orders'),    // user
   getById: (id) => api.get(`/orders/${id}`),
-  updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
-  delete: (id) => api.delete(`/orders/${id}`),
+  create: (data) => api.post('/orders', data),
+  updateStatus: (id, status) =>
+    api.patch(`/orders/${id}/status`, { status }),
+  delete: (id) => api.delete(`/orders/${id}`)
 };

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { cartAPI } from '../api/cart';
 import { useAuth } from './AuthContext';
 
@@ -7,49 +7,58 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
   const { user } = useAuth();
 
-  // 🔹 Синхронізація кошика з сервером при логіні
-  useEffect(() => {
-    if (user && cartItems.length > 0) {
-      cartAPI.sync(
-        cartItems.map(item => ({
-          product: item._id,
-          quantity: item.quantity
-        }))
-      )
-      .then(res => {
-        // Перетворюємо відповідь сервера на формат фронтенду
-        setCartItems(
-          res.data.items.map(i => ({
-            _id: i.product._id,
-            title: i.product.name,
-            price: i.product.finalPrice ?? i.product.price,
-            image: i.product.image,
-            quantity: i.quantity
-          }))
-        );
-      })
-      .catch(err => console.error('Cart sync error', err));
-    }
-  }, [user]);
+  const syncedRef = useRef(false); // 🔒 щоб sync був 1 раз
 
-  // 🔹 Завантаження з localStorage
+  /* ========= LOAD FROM LOCALSTORAGE ========= */
   useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) setCartItems(JSON.parse(storedCart));
+    const stored = localStorage.getItem('cart');
+    if (stored) {
+      setCartItems(JSON.parse(stored));
+    }
   }, []);
 
-  // 🔹 Збереження в localStorage
+  /* ========= SAVE TO LOCALSTORAGE ========= */
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // 🔹 Додати товар
+  /* ========= SYNC AFTER LOGIN ========= */
+  useEffect(() => {
+  if (!user || syncedRef.current || cartItems.length === 0) return;
+
+  syncedRef.current = true;
+
+  cartAPI.sync(
+    cartItems.map(item => ({
+      product: item._id,
+      quantity: item.quantity
+    }))
+  )
+    .then(res => {
+      setCartItems(
+        res.data.items.map(i => ({
+          _id: i.product._id,
+          name: i.product.name,
+          price: i.product.finalPrice ?? i.product.price,
+          image: i.product.image,
+          quantity: i.quantity
+        }))
+      );
+    })
+    .catch(console.error);
+
+}, [user, cartItems]);
+
+
+
+  /* ========= ACTIONS ========= */
+
   const addToCart = (product) => {
     setCartItems(prev => {
       const exists = prev.find(item => item._id === product._id);
+
       if (exists) {
         return prev.map(item =>
           item._id === product._id
@@ -57,11 +66,12 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
+
       return [
         ...prev,
         {
           _id: product._id,
-          title: product.name,
+          name: product.name,
           price: product.finalPrice ?? product.price,
           image: product.image,
           quantity: 1
@@ -70,42 +80,31 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // 🔹 Видалити товар
-  const removeFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item._id !== productId));
-  };
 
-  // 🔹 Збільшити кількість
-  const increaseQuantity = (productId) => {
+
+  const removeFromCart = (id) =>
+    setCartItems(prev => prev.filter(i => i._id !== id));
+
+  const increaseQuantity = (id) =>
     setCartItems(prev =>
-      prev.map(item =>
-        item._id === productId
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
+      prev.map(i =>
+        i._id === id ? { ...i, quantity: i.quantity + 1 } : i
       )
     );
-  };
 
-  // 🔹 Зменшити кількість
-  const decreaseQuantity = (productId) => {
+  const decreaseQuantity = (id) =>
     setCartItems(prev =>
       prev
-        .map(item =>
-          item._id === productId
-            ? { ...item, quantity: item.quantity - 1 }
-            : item
+        .map(i =>
+          i._id === id ? { ...i, quantity: i.quantity - 1 } : i
         )
-        .filter(item => item.quantity > 0)
+        .filter(i => i.quantity > 0)
     );
-  };
 
-  // 🔹 Очистити кошик
   const clearCart = () => setCartItems([]);
 
-  // 🔹 Відкрити / закрити кошик
-  const toggleCartOpen = (state) => {
+  const toggleCartOpen = (state) =>
     setIsCartOpen(state !== undefined ? state : !isCartOpen);
-  };
 
   return (
     <CartContext.Provider value={{

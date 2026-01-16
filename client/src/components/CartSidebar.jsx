@@ -36,7 +36,7 @@ const CartSidebar = () => {
             {cartItems.map(item => (
               <li key={item._id} className="cart-item">
                 <div className="info">
-                  <span className="title">{item.title}</span>
+                  <span className="title">{item.name}</span>
                   <span className="price">{item.price} ₴</span>
                 </div>
 

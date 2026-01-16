@@ -2,47 +2,35 @@ import Order from '../models/Order.js';
 import Cart from '../models/Cart.js';
 
 // POST /api/orders - Створити замовлення
-export const createOrder = async (req, res, next) => {
+export const createOrder = async (req, res) => {
   try {
-    const { items, guestInfo, comment } = req.body;
-    const userId = req.user?._id || null;
+    const { items, guestInfo, comment, totalAmount } = req.body;
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ error: 'Кошик порожній' });
+    if (!items || !items.length) {
+      return res.status(400).json({ error: 'Items are required' });
     }
 
-    // Розрахунок загальної суми
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    const orderData = {
-      user: userId,
-      items,
+    const order = await Order.create({
+      user: req.user?._id || null,
+      guestInfo: req.user ? null : guestInfo,
+      items: items.map(item => ({
+        product: item.product,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
       totalAmount,
-      comment: comment || '',
-      status: 'new'
-    };
-
-    // Якщо гість - додати guestInfo
-    if (!userId && guestInfo) {
-      orderData.guestInfo = guestInfo;
-    }
-
-    const order = await Order.create(orderData);
-    await order.populate('items.product');
-
-    // Очистити кошик якщо користувач авторизований
-    if (userId) {
-      await Cart.findOneAndUpdate(
-        { user: userId },
-        { items: [] }
-      );
-    }
+      comment
+    });
 
     res.status(201).json(order);
-  } catch (error) {
-    next(error);
+
+  } catch (err) {
+    console.error('CREATE ORDER ERROR:', err);
+    res.status(400).json({ error: err.message });
   }
 };
+
 
 // GET /api/orders - Отримати замовлення
 export const getOrders = async (req, res, next) => {
@@ -84,9 +72,10 @@ export const getOrderById = async (req, res, next) => {
       return res.status(404).json({ error: 'Замовлення не знайдено' });
     }
 
-    // Перевірка доступу
     const isAdmin = req.user.role === 'admin';
-    const isOwner = order.user && order.user._id.toString() === req.user._id.toString();
+    const isOwner =
+      order.user &&
+      order.user._id.toString() === req.user._id.toString();
 
     if (!isAdmin && !isOwner) {
       return res.status(403).json({ error: 'Доступ заборонено' });
@@ -98,13 +87,14 @@ export const getOrderById = async (req, res, next) => {
   }
 };
 
+
 // PATCH /api/orders/:id/status - Оновити статус (Admin)
 export const updateOrderStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
 
     const validStatuses = ['new', 'confirmed', 'assembled', 'shipped', 'delivered', 'cancelled'];
-    
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Невалідний статус' });
     }
@@ -143,6 +133,22 @@ export const deleteOrder = async (req, res, next) => {
     }
 
     res.json({ message: 'Замовлення видалено', order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/orders/my - Мої замовлення
+export const getMyOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({
+      user: req.user._id,
+      deletedAt: null
+    })
+      .populate('items.product')
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
   } catch (error) {
     next(error);
   }

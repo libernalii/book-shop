@@ -8,7 +8,7 @@ const OrderSchema = new mongoose.Schema(
       ref: 'User',
       default: null
     },
-    
+
     // Дані гостя (якщо user === null)
     guestInfo: {
       fullName: {
@@ -29,7 +29,7 @@ const OrderSchema = new mongoose.Schema(
         trim: true
       }
     },
-    
+
     // Товари в замовленні
     items: [
       {
@@ -38,11 +38,18 @@ const OrderSchema = new mongoose.Schema(
           ref: 'Product',
           required: true
         },
+
+        name: {                
+          type: String,
+          required: true,
+        },
+
         quantity: {
           type: Number,
           required: true,
           min: 1
         },
+
         price: {
           type: Number,
           required: true,
@@ -50,21 +57,21 @@ const OrderSchema = new mongoose.Schema(
         }
       }
     ],
-    
+
     // Загальна сума
     totalAmount: {
       type: Number,
       required: true,
       min: 0
     },
-    
+
     // Статус замовлення
     status: {
       type: String,
       enum: ['new', 'confirmed', 'assembled', 'shipped', 'delivered', 'cancelled', 'deleted'],
       default: 'new'
     },
-    
+
     // Коментар до замовлення
     comment: {
       type: String,
@@ -72,7 +79,7 @@ const OrderSchema = new mongoose.Schema(
       default: '',
       maxlength: [500, 'Коментар має бути не більше 500 символів']
     },
-    
+
     // Soft delete
     deletedAt: {
       type: Date,
@@ -90,7 +97,7 @@ const OrderSchema = new mongoose.Schema(
 );
 
 // Метод для отримання замовлень без видалених
-OrderSchema.statics.findActive = function() {
+OrderSchema.statics.findActive = function () {
   return this.find({ deletedAt: null });
 };
 

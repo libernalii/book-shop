@@ -25,19 +25,19 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <FilterProvider>
+      <AuthProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <FilterProvider>
+              <BrowserRouter>
                 <App />
-                <Toaster position="top-right" />
-                <ReactQueryDevtools initialIsOpen={false} />
-              </FilterProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </AuthProvider>
-      </BrowserRouter>
+              </BrowserRouter>
+              <Toaster position="top-right" />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </FilterProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

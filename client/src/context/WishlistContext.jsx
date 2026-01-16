@@ -7,8 +7,13 @@ export const WishlistProvider = ({ children }) => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   const addToWishlist = (book) => {
-    if (!wishlist.find(item => item.id === book.id)) setWishlist(prev => [...prev, book]);
+    setWishlist(prev => {
+      const exists = prev.find(item => item._id === book._id);
+      if (exists) return prev; 
+      return [...prev, book];
+    });
   };
+
 
   const removeFromWishlist = (bookId) => {
     setWishlist(prev => prev.filter(item => item.id !== bookId));
@@ -20,7 +25,9 @@ export const WishlistProvider = ({ children }) => {
     else addToWishlist(book);
   };
 
-  const isInWishlist = (bookId) => wishlist.some(item => item.id === bookId);
+  const isInWishlist = (bookId) =>
+    wishlist.some(item => item._id === bookId);
+
 
   const toggleWishlistOpen = (state) => {
     setIsWishlistOpen(state !== undefined ? state : !isWishlistOpen);

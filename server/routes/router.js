@@ -30,9 +30,9 @@ router.patch('/products/:id', protect, adminOnly, productController.updateProduc
 router.delete('/products/:id', protect, adminOnly, productController.deleteProduct);
 
 // ORDERS
-router.post('/orders', orderController.createOrder);
 router.get('/orders', protect, orderController.getOrders);
 router.get('/orders/:id', protect, orderController.getOrderById);
+router.post('/orders', protect, orderController.createOrder);
 router.patch('/orders/:id/status', protect, adminOnly, orderController.updateOrderStatus);
 router.delete('/orders/:id', protect, adminOnly, orderController.deleteOrder);
 

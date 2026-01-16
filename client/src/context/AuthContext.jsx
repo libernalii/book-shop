@@ -4,56 +4,85 @@ import { authAPI } from '../api/auth';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const savedUser = localStorage.getItem('user');
-    if (token && savedUser) setUser(JSON.parse(savedUser));
-    setLoading(false);
+    const initAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+
+      // якщо токена нема — не ліземо на бек
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await authAPI.getMe();
+        setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
+      } catch (error) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
   const login = async (credentials) => {
-    try {
-      const { data } = await authAPI.login(credentials);
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      return data;
-    } catch (err) {
-      console.error('Login error:', err.response?.data);
-      throw err;
-    }
+    const { data } = await authAPI.login(credentials);
+
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    setUser(data.user);
+    return data;
   };
 
   const register = async (userData) => {
-    try {
-      const { data } = await authAPI.register(userData);
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      return data;
-    } catch (err) {
-      console.error('Register error:', err.response?.data);
-      throw err;
-    }
+    const { data } = await authAPI.register(userData);
+
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    setUser(data.user);
+    return data;
   };
 
   const logout = async () => {
     try {
       await authAPI.logout();
     } finally {
-      localStorage.clear();
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, isAuthenticated: !!user }}>
-      {children}
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isAuthenticated: Boolean(user),
+        login,
+        register,
+        logout
+      }}
+    >
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

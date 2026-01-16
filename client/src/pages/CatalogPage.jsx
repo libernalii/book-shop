@@ -42,7 +42,7 @@ function CatalogPage() {
     keepPreviousData: true,
   });
 
-  const products = productsData?.products || [];
+  const products = productsData?.products ?? [];
   const totalPages = productsData?.totalPages || Math.ceil((productsData?.total || 0) / limit);
 
   // Сортування на фронті

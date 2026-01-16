@@ -19,7 +19,7 @@ function WishlistSidebar() {
         <ul>
           {wishlist.map(item => (
             <li key={item.id}>
-              {item.title} - {item.price} ₴
+              {item.name} - {item.price} ₴
               <button onClick={() => removeFromWishlist(item.id)}>Видалити</button>
             </li>
           ))}

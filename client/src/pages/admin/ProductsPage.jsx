@@ -45,16 +45,24 @@ const ProductsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const payload = {
+      ...form,
+      price: Number(form.price),
+      discount: Number(form.discount),
+      stock: Number(form.stock),
+    };
+
     if (editingId) {
-      await productsAPI.update(editingId, form);
+      await productsAPI.update(editingId, payload);
     } else {
-      await productsAPI.create(form);
+      await productsAPI.create(payload);
     }
 
     setForm(emptyProduct);
     setEditingId(null);
     loadData();
   };
+
 
   const handleEdit = (product) => {
     setEditingId(product._id);

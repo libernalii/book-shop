@@ -1,0 +1,91 @@
+.order-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.order-info,
+.order-delivery,
+.order-items {
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed #ddd;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.order-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-bottom: 10px;
+
+  &.new { background: #eef; }
+  &.confirmed { background: #e6f7ff; }
+  &.assembled { background: #fffbe6; }
+  &.shipped { background: #f0f5ff; }
+  &.delivered { background: #f6ffed; }
+  &.cancelled { background: #fff1f0; }
+}
+
+.order-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+
+  button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+  }
+}
+
+/* ================== ЧЕК ================== */
+
+#order-receipt {
+  display: none;
+}
+
+/* ================== PRINT ================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #order-receipt,
+  #order-receipt * {
+    visibility: visible;
+  }
+
+  #order-receipt {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    font-family: monospace;
+  }
+
+  #order-receipt h2 {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  #order-receipt hr {
+    margin: 10px 0;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ProfilePage.scss';
+import { Link } from 'react-router-dom';
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
@@ -54,6 +55,9 @@ const ProfilePage = () => {
           <button className="btn logout-btn" onClick={logout}>Вийти</button>
           {message && <p className="success-message">{message}</p>}
         </div>
+        <Link to="/orders" className="profile-link">
+        📦 Мої замовлення
+      </Link>
       </div>
     </div>
   );
